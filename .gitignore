@@ -1,0 +1,14 @@
+node_modules
+
+# IDE configuration files
+.idea
+
+# pnpm
+.pnpm-debug.log
+*/.pnpm-debug.log
+
+# OS X
+.DS_Store
+
+# Bazel specific
+/bazel-*

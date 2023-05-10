@@ -1,0 +1,46 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+ts_config(
+    name = "ts_config",
+    src = "tsconfig.json",
+)
+
+bool_flag(
+    name = "source_maps_enabled",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "genapp_enable_source_maps",
+    flag_values = {
+        ":source_maps_enabled": "True",
+    },
+)
+
+ts_project(
+    name = "compile",
+    srcs = glob(["src/**/*.ts"]),
+    declaration_map = False,
+    args = select({
+        ":genapp_enable_source_maps": ["--sourceMap"],
+        "//conditions:default": [],
+    }),
+    source_map = select({
+        ":genapp_enable_source_maps": True,
+        "//conditions:default": False,
+    }),
+    supports_workers = False,
+    tags = [
+        "no-cache",
+    ],
+    tsconfig = ":ts_config",
+    deps = [
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/yargs",
+        "//:node_modules/yargs"
+    ],
+)
